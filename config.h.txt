@@ -1,0 +1,13 @@
+
+//
+// THIS IS A CONFIG TEMPLATE
+//
+// 1. copy this file to config.h
+// 2. update the definitions in that config.h
+//
+
+#define AIO_USERNAME "your_adafruit_io_username"
+#define AIO_KEY "your_adafruit_io_key"
+
+#define WIFI_SSID "your_wifi_ssid"
+#define WIFI_PASS "your_wifi_password"
