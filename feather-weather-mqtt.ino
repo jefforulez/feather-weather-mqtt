@@ -43,7 +43,6 @@ Adafruit_MQTT_Client mqtt( &client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AI
 Adafruit_MQTT_Publish mqtt_temperature = Adafruit_MQTT_Publish( &mqtt, AIO_USERNAME "/feeds/temperature" ) ;
 Adafruit_MQTT_Publish mqtt_humidity = Adafruit_MQTT_Publish( &mqtt, AIO_USERNAME "/feeds/humidity" ) ;
 
-
 //
 // oled
 //
@@ -54,6 +53,11 @@ Adafruit_MQTT_Publish mqtt_humidity = Adafruit_MQTT_Publish( &mqtt, AIO_USERNAME
 #include <Adafruit_SPITFT.h>
 #include <Adafruit_SPITFT_Macros.h>
 #include <gfxfont.h>
+
+#define OLED_BUTTON_A 0
+#define OLED_BUTTON_B 16
+#define OLED_BUTTON_C 2
+#define OLED_LED      0
 
 Adafruit_SSD1306 display = Adafruit_SSD1306();
 
@@ -69,6 +73,11 @@ void setup() {
   Serial.println("OLED FeatherWing test");
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x32)
   display.display();
+
+  pinMode( OLED_BUTTON_A, INPUT_PULLUP ) ;
+  pinMode( OLED_BUTTON_B, INPUT_PULLUP ) ;
+  pinMode( OLED_BUTTON_C, INPUT_PULLUP ) ;
+
   Serial.println("OLED begun");
 
   // wifi
@@ -119,11 +128,20 @@ void setup() {
 
   // Set delay between sensor readings based on sensor details.
   delayMS = sensor.min_delay / 1000;
+  delayMS = ( 5000 > delayMS ) ? 5000 : delayMS ;
+  Serial.print( "delayMS: " ) ; Serial.println( delayMS ) ;
 }
 
 void loop() {
   // Delay between measurements.
-  delay(delayMS);
+  for ( int i = 0 ; i <= delayMS ; i += 10 ) {
+
+    if ( ! digitalRead( OLED_BUTTON_A ) ) {
+      Serial.println("A") ;
+    }
+
+    delay(10);
+  }
 
   Serial.println( F("loop() MQTT_connect()") ) ;
   MQTT_connect();
@@ -134,7 +152,8 @@ void loop() {
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(0,0);
-  display.print("IP: "); display.println( WiFi.localIP() );
+  display.print( F("WiFi: ") ) ; display.println( WIFI_SSID );
+  display.print( F("IP: ") ) ; display.println( WiFi.localIP() );
 
   //
   sensors_event_t event ;
@@ -192,8 +211,6 @@ void loop() {
 
   display.setCursor(0,0);
   display.display();
-
-  delay( 10000 - delayMS ) ;
 }
 
 
